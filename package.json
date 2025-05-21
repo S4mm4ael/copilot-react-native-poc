@@ -2,7 +2,6 @@
   "name": "my-react-native-app",
   "version": "1.0.0",
   "private": true,
-  "main": "./src/App.tsx",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
