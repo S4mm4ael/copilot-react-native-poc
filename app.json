@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyReactNativeApp",
-    "slug": "my-react-native-app",
+    "name": "TwPocCopilotApp",
+    "slug": "tw-poc-copilot-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
