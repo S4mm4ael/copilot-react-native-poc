@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
 import PokemonListScreen from '../features/pokemon-list/PokemonListScreen';
@@ -9,10 +8,9 @@ import CustomHeader from '../components/shared/CustomHeader';
 
 /**
  * The main app navigator using a type-safe stack.
- * Registers all feature screens.
+ * Registers all feature screens and configures the global header.
+ * As per our guidelines, this component does NOT include the NavigationContainer.
  */
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
 const AppNavigator: React.FC = () => {
   const { theme } = useTheme();
 
