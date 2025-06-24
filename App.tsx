@@ -1,7 +1,6 @@
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar, StyleSheet, View } from 'react-native';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ThemeProvider, useTheme } from './src/theme/useTheme';
 
@@ -40,20 +39,21 @@ const AppContent: React.FC = () => {
 
 /**
  * Root App component.
- * It's responsible for setting up all the global providers.
- * The SafeAreaProvider should be at the very root.
+ * Renders the main AppNavigator inside a SafeAreaView and ThemeProvider.
+ * Ensures the SafeAreaView covers all edges and uses the theme background.
  */
 const App: React.FC = () => (
-  <SafeAreaProvider>
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
-  </SafeAreaProvider>
+  <ThemeProvider>
+    <SafeAreaProvider>
+        <StatusBar barStyle="dark-content" />
+        <AppNavigator />
+    </SafeAreaProvider>
+  </ThemeProvider>
 );
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1, // You can set this dynamically from theme if needed
   },
 });
 

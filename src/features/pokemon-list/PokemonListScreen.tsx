@@ -52,11 +52,6 @@ const PokemonListScreen: React.FC = () => {
           <ActivityIndicator size="small" style={styles.searchLoading} />
         )}
       </View>
-      {error && !loading && (
-        <View style={styles.centered}>
-          <Text style={[styles.errorText, { color: navTheme.colors.text }]}>{error}</Text>
-        </View>
-      )}
       <FlatList
         data={data}
         keyExtractor={(item) => item.name}
