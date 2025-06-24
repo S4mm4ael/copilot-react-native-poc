@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { getPokemonList, searchPokemon, PokemonListItem } from '../../api/pokemon';
 
 /**
@@ -16,7 +16,7 @@ interface UsePokemonListResult {
 }
 
 /**
- * Custom hook to fetch and manage a paginated list of Pokémon, with search support.
+ * Custom hook to fetch and manage a paginated list of Pokémon, with throttled search support.
  * Handles loading, error, pagination, refresh, and search logic.
  * @param limit Number of Pokémon to fetch per page.
  * @returns State and actions for the Pokémon list.
@@ -28,51 +28,82 @@ export function usePokemonList(limit: number = 20): UsePokemonListResult {
   const [offset, setOffset] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchList = useCallback(
-    async (reset = false) => {
+  // Throttled search effect
+  useEffect(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    // Only search after 2+ characters, otherwise show paginated list
+    if (search.trim().length > 1) {
       setLoading(true);
       setError(null);
-      try {
-        if (search.trim().length > 0) {
-          // Search mode: fetch by name using searchPokemon API
+      searchTimeout.current = setTimeout(async () => {
+        try {
           const result = await searchPokemon(search.trim());
           if (result) {
             setData([result]);
             setHasMore(false);
+            setError(null);
           } else {
             setData([]);
             setHasMore(false);
             setError('No Pokémon found with that name.');
           }
-        } else {
-          // Regular paginated list
-          const res = await getPokemonList(limit, reset ? 0 : offset);
-          setData(prev =>
-            reset ? res.results : [...prev, ...res.results]
-          );
-          setHasMore(Boolean(res.next));
+        } catch (err) {
+          setData([]);
+          setHasMore(false);
+          setError(err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
+      }, 400); // 400ms throttle
+    } else {
+      // Reset to paginated list if search is cleared or too short
+      setOffset(0);
+      setError(null);
+      setLoading(true);
+      searchTimeout.current = setTimeout(async () => {
+        try {
+          const res = await getPokemonList(limit, 0);
+          setData(res.results);
+          setHasMore(Boolean(res.next));
+        } catch (err) {
+          setData([]);
+          setHasMore(false);
+          setError(err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+          setLoading(false);
+        }
+      }, 200); // small delay for UX consistency
+    }
+
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, limit]);
+
+  // Pagination effect (only when not searching)
+  useEffect(() => {
+    if (search.trim().length > 1 || offset === 0) return;
+    setLoading(true);
+    setError(null);
+    getPokemonList(limit, offset)
+      .then((res) => {
+        setData((prev) => (offset === 0 ? res.results : [...prev, ...res.results]));
+        setHasMore(Boolean(res.next));
+      })
+      .catch((err) => {
         setData([]);
         setHasMore(false);
         setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [limit, offset, search]
-  );
-
-  useEffect(() => {
-    fetchList(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
-
-  useEffect(() => {
-    if (!search) {
-      fetchList(offset === 0);
-    }
+      })
+      .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset, limit]);
 
@@ -80,8 +111,8 @@ export function usePokemonList(limit: number = 20): UsePokemonListResult {
    * Loads the next page of Pokémon, if available.
    */
   const loadMore = useCallback(() => {
-    if (hasMore && !loading && !search) {
-      setOffset(prev => prev + limit);
+    if (hasMore && !loading && search.trim().length <= 1) {
+      setOffset((prev) => prev + limit);
     }
   }, [hasMore, loading, limit, search]);
 
@@ -90,8 +121,8 @@ export function usePokemonList(limit: number = 20): UsePokemonListResult {
    */
   const refresh = useCallback(() => {
     setOffset(0);
-    fetchList(true);
-  }, [fetchList]);
+    setSearch('');
+  }, []);
 
   return { data, loading, error, loadMore, hasMore, refresh, search, setSearch };
 }

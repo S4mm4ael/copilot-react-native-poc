@@ -25,17 +25,22 @@ const PokemonListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search Pokémon by name"
-        value={search}
-        onChangeText={setSearch}
-        autoCapitalize="none"
-        autoCorrect={false}
-        clearButtonMode="while-editing"
-        testID="pokemon-search-input"
-      />
-      {error && (
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search Pokémon by name"
+          value={search}
+          onChangeText={setSearch}
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="while-editing"
+          testID="pokemon-search-input"
+        />
+        {search.trim().length > 1 && loading && (
+          <ActivityIndicator size="small" style={styles.searchLoading} />
+        )}
+      </View>
+      {error && !loading && (
         <View style={styles.centered}>
           <Text style={styles.errorText}>Error: {error}</Text>
         </View>
@@ -55,7 +60,7 @@ const PokemonListScreen: React.FC = () => {
         contentContainerStyle={data.length === 0 ? styles.centered : undefined}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
-          !loading && search.trim().length > 0 ? (
+          !loading && search.trim().length > 1 ? (
             <Text style={styles.errorText}>No Pokémon found with that name.</Text>
           ) : null
         }
@@ -69,14 +74,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   searchInput: {
+    flex: 1,
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    marginBottom: 12,
     backgroundColor: '#fff',
+  },
+  searchLoading: {
+    marginLeft: 8,
   },
   centered: {
     flex: 1,
