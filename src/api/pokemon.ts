@@ -84,5 +84,5 @@ export async function searchPokemon(
       return null;
     }
     throw error;
-  }d
+  }
 }
