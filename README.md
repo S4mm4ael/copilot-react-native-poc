@@ -25,5 +25,5 @@ https://github.com/user-attachments/assets/46b5bb38-4e8c-4d44-8c7b-ffcbbae3837f
 - **Language:** TypeScript
 - **Navigation:** React Navigation with a type-safe stack navigator.
 - **State Management:** Local state is managed with custom hooks (`usePokemonList`, `usePokemonDetail`), while global state (theme, language) is handled via the React Context API.
-- **UI:** Includes support for light/dark themes and internationalization (EN/BY).
+- **UI:** Includes support for light/dark themes.
 - **Architecture:** Follows a feature-based directory structure to promote code encapsulation
