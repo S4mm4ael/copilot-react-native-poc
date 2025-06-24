@@ -63,3 +63,26 @@ export async function getPokemonDetails(
     throw error;
   }
 }
+
+/**
+ * Fetches a Pokémon by name or ID and maps it to a PokemonListItem.
+ * @param search Name or ID of the Pokémon to search.
+ * @returns Promise resolving to a PokemonListItem or null if not found.
+ */
+export async function searchPokemon(
+  search: string
+): Promise<PokemonListItem | null> {
+  try {
+    const pokemon = await getPokemonDetails(search.trim().toLowerCase());
+    return {
+      name: pokemon.name,
+      url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id}/`,
+    };
+  } catch (error: any) {
+    // Only return null for 404 (not found), otherwise rethrow
+    if (error instanceof Error && 'message' in error && error.message.includes('Failed to fetch Pokémon details')) {
+      return null;
+    }
+    throw error;
+  }d
+}

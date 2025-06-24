@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
@@ -8,10 +8,11 @@ import { usePokemonList } from './usePokemonList';
 /**
  * Screen for displaying a paginated list of Pokémon.
  * Uses usePokemonList hook for data and navigation to detail screen.
+ * Now includes a search bar for filtering by name.
  */
 const PokemonListScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { data, loading, error, loadMore, hasMore, refresh } = usePokemonList(20);
+  const { data, loading, error, loadMore, hasMore, refresh, search, setSearch } = usePokemonList(20);
 
   const renderItem = ({ item }: { item: { name: string } }) => (
     <TouchableOpacity
@@ -24,6 +25,16 @@ const PokemonListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search Pokémon by name"
+        value={search}
+        onChangeText={setSearch}
+        autoCapitalize="none"
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+        testID="pokemon-search-input"
+      />
       {error && (
         <View style={styles.centered}>
           <Text style={styles.errorText}>Error: {error}</Text>
@@ -42,6 +53,12 @@ const PokemonListScreen: React.FC = () => {
           loading && data.length > 0 ? <ActivityIndicator style={{ margin: 16 }} /> : null
         }
         contentContainerStyle={data.length === 0 ? styles.centered : undefined}
+        keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={
+          !loading && search.trim().length > 0 ? (
+            <Text style={styles.errorText}>No Pokémon found with that name.</Text>
+          ) : null
+        }
       />
     </View>
   );
@@ -51,6 +68,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    backgroundColor: '#fff',
   },
   centered: {
     flex: 1,
