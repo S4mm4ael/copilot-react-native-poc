@@ -1,34 +1,45 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp, useTheme as useNavTheme } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { usePokemonList } from './usePokemonList';
+import { useTheme } from '../../theme/useTheme';
 
 /**
  * Screen for displaying a paginated list of Pokémon.
  * Uses usePokemonList hook for data and navigation to detail screen.
- * Now includes a search bar for filtering by name.
+ * Now includes a search bar for filtering by name and theme support.
  */
 const PokemonListScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { data, loading, error, loadMore, hasMore, refresh, search, setSearch } = usePokemonList(20);
+  const { theme } = useTheme();
+  const navTheme = useNavTheme();
 
   const renderItem = ({ item }: { item: { name: string } }) => (
     <TouchableOpacity
       style={styles.item}
       onPress={() => navigation.navigate('PokemonDetail', { pokemonName: item.name })}
     >
-      <Text style={styles.itemText}>{item.name}</Text>
+      <Text style={[styles.itemText, { color: navTheme.colors.text }]}>{item.name}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: navTheme.colors.background }]}>
       <View style={styles.searchRow}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            {
+              backgroundColor: theme === 'dark' ? '#222' : '#fff',
+              color: navTheme.colors.text,
+              borderColor: theme === 'dark' ? '#444' : '#ccc',
+            },
+          ]}
           placeholder="Search Pokémon by name"
+          placeholderTextColor={theme === 'dark' ? '#aaa' : '#888'}
           value={search}
           onChangeText={setSearch}
           autoCapitalize="none"
@@ -42,7 +53,7 @@ const PokemonListScreen: React.FC = () => {
       </View>
       {error && !loading && (
         <View style={styles.centered}>
-          <Text style={styles.errorText}>Error: {error}</Text>
+          <Text style={[styles.errorText, { color: navTheme.colors.text }]}>{error}</Text>
         </View>
       )}
       <FlatList
@@ -52,7 +63,11 @@ const PokemonListScreen: React.FC = () => {
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.5}
         refreshControl={
-          <RefreshControl refreshing={loading && data.length === 0} onRefresh={refresh} />
+          <RefreshControl
+            refreshing={loading && data.length === 0}
+            onRefresh={refresh}
+            tintColor={navTheme.colors.primary}
+          />
         }
         ListFooterComponent={
           loading && data.length > 0 ? <ActivityIndicator style={{ margin: 16 }} /> : null
@@ -61,7 +76,7 @@ const PokemonListScreen: React.FC = () => {
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
           !loading && search.trim().length > 1 ? (
-            <Text style={styles.errorText}>No Pokémon found with that name.</Text>
+            <Text style={[styles.errorText, { color: navTheme.colors.text }]}>No Pokémon found with that name.</Text>
           ) : null
         }
       />
@@ -82,11 +97,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#fff',
   },
   searchLoading: {
     marginLeft: 8,
@@ -99,14 +112,12 @@ const styles = StyleSheet.create({
   item: {
     padding: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ccc',
   },
   itemText: {
     fontSize: 18,
     textTransform: 'capitalize',
   },
   errorText: {
-    color: 'red',
     marginBottom: 16,
   },
 });

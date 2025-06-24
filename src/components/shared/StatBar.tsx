@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme as useNavTheme } from '@react-navigation/native';
 
 /**
  * Props for the StatBar component.
@@ -18,17 +19,18 @@ export interface StatBarProps {
  * Renders a label and a progress-bar-style view for a stat.
  */
 const StatBar: React.FC<StatBarProps> = ({ label, value, color }) => {
+  const navTheme = useNavTheme();
   // Clamp value between 0 and 255 for safety
   const clampedValue = Math.max(0, Math.min(255, value));
   const widthPercent = (clampedValue / 255) * 100;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: navTheme.colors.text }]}>{label}</Text>
       <View style={styles.barBackground}>
         <View style={[styles.barFill, { width: `${widthPercent}%`, backgroundColor: color }]} />
       </View>
-      <Text style={styles.value}>{clampedValue}</Text>
+      <Text style={[styles.value, { color: navTheme.colors.text }]}>{clampedValue}</Text>
     </View>
   );
 };

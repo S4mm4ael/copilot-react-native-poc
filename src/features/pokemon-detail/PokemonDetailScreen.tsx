@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, Image, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useTheme as useNavTheme } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { usePokemonDetail } from './usePokemonDetail';
 import StatBar from '../../components/shared/StatBar';
+import { useTheme } from '../../theme/useTheme';
 
 /**
  * Screen for displaying detailed information about a Pokémon.
@@ -15,10 +16,12 @@ const PokemonDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PokemonDetail'>>();
   const { pokemonName } = route.params;
   const { data, loading, error } = usePokemonDetail(pokemonName);
+  const { theme } = useTheme();
+  const navTheme = useNavTheme();
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={[styles.centered, { backgroundColor: navTheme.colors.background }]}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -26,15 +29,15 @@ const PokemonDetailScreen: React.FC = () => {
 
   if (error || !data) {
     return (
-      <View style={styles.centered}>
-        <Text>Error: {error || 'Pokémon not found.'}</Text>
+      <View style={[styles.centered, { backgroundColor: navTheme.colors.background }]}>
+        <Text style={{ color: navTheme.colors.text }}>Error: {error || 'Pokémon not found.'}</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.name}>{data.name}</Text>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: navTheme.colors.background }]}>
+      <Text style={[styles.name, { color: navTheme.colors.text }]}>{data.name}</Text>
       <Image
         source={{ uri: data.sprites.other['official-artwork'].front_default || '' }}
         style={styles.image}
@@ -42,8 +45,8 @@ const PokemonDetailScreen: React.FC = () => {
       />
       <View style={styles.typesContainer}>
         {data.types.map((t) => (
-          <View key={t.type.name} style={styles.typeBadge}>
-            <Text style={styles.typeText}>{t.type.name}</Text>
+          <View key={t.type.name} style={[styles.typeBadge, { backgroundColor: theme === 'dark' ? '#333' : '#eee' }]}>
+            <Text style={[styles.typeText, { color: navTheme.colors.text }]}>{t.type.name}</Text>
           </View>
         ))}
       </View>
@@ -53,7 +56,7 @@ const PokemonDetailScreen: React.FC = () => {
             key={stat.stat.name}
             label={stat.stat.name}
             value={stat.base_stat}
-            color="#4CAF50"
+            color={theme === 'dark' ? '#90caf9' : '#4CAF50'}
           />
         ))}
       </View>
@@ -87,7 +90,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   typeBadge: {
-    backgroundColor: '#eee',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -103,4 +105,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export default PokemonDetailScreen;
 export default PokemonDetailScreen;
