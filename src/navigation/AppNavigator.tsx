@@ -1,63 +1,39 @@
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
 import PokemonListScreen from '../features/pokemon-list/PokemonListScreen';
 import PokemonDetailScreen from '../features/pokemon-detail/PokemonDetailScreen';
-import ThemeSwitcher from '../components/shared/ThemeSwitcher';
-import { useTheme } from '../theme/useTheme';
-import { View, Text, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CustomHeader from '../components/shared/CustomHeader';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
  * The main app navigator using a type-safe stack.
- * Registers all feature screens.
+ * Registers all feature screens and configures the global header.
+ * As per our guidelines, this component does NOT include the NavigationContainer.
  */
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
 const AppNavigator: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
-  const insets = useSafeAreaInsets();
-
   return (
-    <NavigationContainer theme={theme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator
-        initialRouteName="PokemonList"
-        screenOptions={{
-          header: (props) => (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 16,
-                paddingTop: insets.top,
-                height: 56 + insets.top,
-                backgroundColor: theme === 'dark' ? '#222' : '#fff',
-                borderBottomWidth: StyleSheet.hairlineWidth,
-                borderBottomColor: theme === 'dark' ? '#333' : '#ccc',
-              }}
-            >
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme === 'dark' ? '#fff' : '#222' }}>
-                {props.options.title ?? props.route.name}
-              </Text>
-              <ThemeSwitcher isDark={theme === 'dark'} onToggle={toggleTheme} />
-            </View>
-          ),
-        }}
-      >
-        <Stack.Screen
-          name="PokemonList"
-          component={PokemonListScreen}
-          options={{ title: 'Pokémon List' }}
-        />
-        <Stack.Screen
-          name="PokemonDetail"
-          component={PokemonDetailScreen}
-          options={{ title: 'Pokémon Detail' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      initialRouteName="PokemonList"
+      screenOptions={{
+        // Use the new reusable header component
+        header: (props) => <CustomHeader {...props} />,
+      }}
+    >
+      <Stack.Screen
+        name="PokemonList"
+        component={PokemonListScreen}
+        options={{ title: 'Pokémon List' }}
+      />
+      <Stack.Screen
+        name="PokemonDetail"
+        component={PokemonDetailScreen}
+        // The title for this screen will be automatically used by the custom header.
+        // You can also set it dynamically like this if needed:
+        // options={({ route }) => ({ title: route.params.pokemonName })}
+      />
+    </Stack.Navigator>
   );
 };
 
