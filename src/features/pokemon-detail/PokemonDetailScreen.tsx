@@ -3,7 +3,7 @@ import { View, Text, Image, ActivityIndicator, StyleSheet, ScrollView } from 're
 import { useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
-import { usePokemonDetail } from './usePokemonDetail
+import { usePokemonDetail } from './usePokemonDetail';
 import StatBar from '../../components/shared/StatBar';
 
 /**
