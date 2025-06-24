@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp, useTheme as useNavTheme } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme as useNavTheme } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { usePokemonList } from './usePokemonList';
 import { useTheme } from '../../theme/useTheme';

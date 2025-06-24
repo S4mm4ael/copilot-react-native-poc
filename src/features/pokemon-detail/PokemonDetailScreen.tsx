@@ -106,4 +106,3 @@ const styles = StyleSheet.create({
 });
 
 export default PokemonDetailScreen;
-export default PokemonDetailScreen;

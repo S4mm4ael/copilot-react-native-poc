@@ -1,4 +1,5 @@
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ThemeProvider } from './src/theme/useTheme';
@@ -9,10 +10,12 @@ import { ThemeProvider } from './src/theme/useTheme';
  */
 const App: React.FC = () => (
   <ThemeProvider>
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <AppNavigator />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        <AppNavigator />
+      </SafeAreaView>
+    </SafeAreaProvider>
   </ThemeProvider>
 );
 
