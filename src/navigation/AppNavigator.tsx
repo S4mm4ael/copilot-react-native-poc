@@ -6,6 +6,11 @@ import PokemonDetailScreen from '../features/pokemon-detail/PokemonDetailScreen'
 import { useTheme } from '../theme/useTheme';
 import CustomHeader from '../components/shared/CustomHeader';
 
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+
+  const Stack = createNativeStackNavigator<RootStackParamList>();
+
+
 /**
  * The main app navigator using a type-safe stack.
  * Registers all feature screens and configures the global header.

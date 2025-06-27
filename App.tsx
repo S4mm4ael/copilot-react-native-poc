@@ -3,6 +3,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ThemeProvider, useTheme } from './src/theme/useTheme';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 
 /**
  * This component contains the main app content and logic for theme handling.
